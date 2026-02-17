@@ -1,0 +1,16 @@
+{
+  "name": "internal-process-manager",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "General purpose automation script",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "axios": "^1.13.5",
+    "dotenv": "^16.6.1",
+    "sharp": "^0.34.5",
+    "wolf.js": "^2.7.10"
+  }
+}
