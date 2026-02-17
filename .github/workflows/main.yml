@@ -1,0 +1,19 @@
+name: Run Wolf Bot
+
+on:
+  workflow_dispatch: # يتيح لك تشغيل البوت يدوياً بضغطة زر
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm install
+      - name: Run Bot
+        env:
+          U_MAIL: ${{ secrets.U_MAIL }}
+          U_PASS: ${{ secrets.U_PASS }}
+        run: node app.js
