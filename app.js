@@ -27,9 +27,9 @@ const formatAMPM = (date) => {
 service.on('ready', async () => {
     console.log(`✅ تم تسجيل الدخول: ${service.currentSubscriber.nickname}`);
     
-    const targetGroup = 9969;
+    const targetGroup = 18432094;
     const totalEvents = 32;
-    let startTime = new Date(2026, 1, 19, 21, 0, 0); // تبدأ من 12:00 AM يوم 18 فبراير
+    let startTime = new Date(2026, 1, 21, 21, 0, 0); // تبدأ من 12:00 AM يوم 18 فبراير
     const surveyRecords = [];
 
     try {
@@ -93,3 +93,4 @@ service.on('ready', async () => {
 
 
 service.login(process.env.U_MAIL, process.env.U_PASS);
+
