@@ -29,7 +29,7 @@ service.on('ready', async () => {
     
     const targetGroup = 18432094;
     const totalEvents = 32;
-    let startTime = new Date(2026, 2, 31, 21, 0, 0); // تبدأ من 12:00 AM يوم 18 فبراير
+    let startTime = new Date(2026, 3, 1, 21, 0, 0); // تبدأ من 12:00 AM يوم 18 فبراير
     const surveyRecords = [];
 
     try {
