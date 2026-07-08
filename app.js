@@ -7,7 +7,7 @@ const { WOLF } = wolfjs;
 const service = new WOLF();
 
 // اسم الفعالية الموحد (يتكرر لكل الفعاليات)
-const eventName = " ᷂فعاليآت ᷂خليجنا،ذوق";
+const eventName = " ᷂فعاليآت ᷂خليجنا،ذوق.";
 
 const formatAMPM = (date) => {
     let hours = date.getHours();
