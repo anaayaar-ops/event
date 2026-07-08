@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import fs from 'fs';
+import sharp from 'sharp';
 import wolfjs from 'wolf.js';
 const { WOLF } = wolfjs;
 
@@ -29,7 +30,7 @@ service.on('ready', async () => {
     
     const targetGroup = 18432094;
     const totalEvents = 32;
-    let startTime = new Date(2026, 6, 10, 21, 0, 0); // تبدأ من 12:00 AM يوم 18 فبراير
+    let startTime = new Date(2026, 6, 11, 21, 0, 0); // تبدأ من 12:00 AM يوم 18 فبراير
     const surveyRecords = [];
 
     try {
@@ -60,62 +61,42 @@ service.on('ready', async () => {
                     languageId: 1
                 });
 
-                if (response.success) {
-                    const fDate = `${startTime.getDate()}/${startTime.getMonth() + 1}/${startTime.getFullYear()}`;
-                    const fTime = formatAMPM(startTime);
-
-                    // تخزين البيانات بنظام الاختيار الدوري للاستبيان
-                    surveyRecords.push({
-                        membership: "224",
-                        room: "18432094",
-                        isWeekly: "نعم",
-                        choiceIndex: i, // سيختار الخيار 1، ثم 2، وهكذا في المتصفح
-                        date: fDate,
-                        time: fTime,
-                        id: response.body.id.toString()
-                    });
-                    console.log(`🚀 تم الرفع: ${title} | الوقت: ${fTime} | ID: ${response.body.id}`);
-                }
-            }
+            
             startTime = new Date(endTime.getTime());
         }
 
-        // إنشاء ملف البيانات للمتصفح
-        const jsData = `const allEvents = ${JSON.stringify(surveyRecords, null, 2)};`;
-        fs.writeFileSync('./survey_data.js', jsData, 'utf8');
-        console.log("🏁 انتهى الرفع. ملف survey_data.js جاهز للاستخدام.");
+        // ============ رفع الصور بعد ما خلصت كل الفعاليات ============
+        console.log("\n🖼️ جاري رفع الصور لكل الفعاليات...");
+
+        const imagePath = './178332617173751.jpeg'; // 👈 غيّر الاسم لو غيرت الصورة
+        if (fs.existsSync(imagePath)) {
+            const thumbnailBuffer = await sharp(imagePath).jpeg({ quality: 90 }).toBuffer();
+
+            for (const record of surveyRecords) {
+                try {
+                    const imageResponse = await service.event.group.updateThumbnail(
+                        parseInt(record.id),
+                        thumbnailBuffer
+                    );
+                    console.log(imageResponse.success
+                        ? `🖼️ تم رفع صورة: ID ${record.id}`
+                        : `⚠️ فشلت صورة ID ${record.id}: ${JSON.stringify(imageResponse)}`
+                    );
+                } catch (err) {
+                    console.error(`❌ خطأ برفع صورة ID ${record.id}:`, err.message);
+                }
+                await new Promise(resolve => setTimeout(resolve, 800));
+            }
+        } else {
+            console.error(`❌ الصورة غير موجودة بالمسار: ${imagePath}`);
+        }
 
     } catch (err) {
         console.error("❌ خطأ:", err.message);
+
     }
     process.exit();
 });
 
 
 service.login(process.env.U_MAIL, process.env.U_PASS);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
