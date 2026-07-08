@@ -6,15 +6,8 @@ const { WOLF } = wolfjs;
 
 const service = new WOLF();
 
-// القائمة الكاملة (32 اسم) كما وردت في طلبك وملف h11/h12
-const eventNames = [
-    "سوالف وافكار", "تحديات", "ساعة تسلية", "شغّل عقلك", "سوالف ونقاشات", "لعب وطرب", 
-    "خمن الرقم", "سوالف صباحيه", "تحديات خليجنا ذوق", "تحديات ذهنية", "تحدي التخمين", 
-    "صباحيات خليجنا ذوق", "تصادمات رقمية", "جيبها بالثانيه", "سوالف والعاب", "تحدي سهم",
-    "فـ الصحيح", "رتب الحروف", "جلسات حوارية", "منوعات", "تحدي كرة", "سوالف خليجنا ذوق",
-    "تحديات منوعة", "تحديات رقمية", "ساعه نقاش", "فقرات منوعة", "أرقام الحظ", "تحدي الزمن",
-    "سوالف ليل", "تحدي الأرقام", "تحديات بوتات", "صناديق الحظ"
-];
+// اسم الفعالية الموحد (يتكرر لكل الفعاليات)
+const eventName = " ᷂فعاليآت ᷂خليجنا،ذوق";
 
 const formatAMPM = (date) => {
     let hours = date.getHours();
@@ -30,8 +23,8 @@ service.on('ready', async () => {
     
     const targetGroup = 18432094;
     const totalEvents = 32;
-    let startTime = new Date(2026, 6, 11, 21, 0, 0); // تبدأ من 12:00 AM يوم 18 فبراير
-    const surveyRecords = [];
+    let startTime = new Date(2026, 6, 11, 21, 0, 0); // تبدأ من الوقت المحدد
+    const createdEventIds = []; // فقط لتتبع الصور المرفوعة، بدون حفظ بيانات استبيان
 
     try {
         console.log("🔍 فحص التعارض في الروم...");
@@ -39,7 +32,7 @@ service.on('ready', async () => {
         const existingEvents = listRes.success ? listRes.body : [];
 
         for (let i = 0; i < totalEvents; i++) {
-            const title = eventNames[i];
+            const title = eventName;
             const endTime = new Date(startTime.getTime() + 45 * 60000);
 
             // فحص إذا كان الوقت محجوز
@@ -61,7 +54,12 @@ service.on('ready', async () => {
                     languageId: 1
                 });
 
-            
+                if (response.success) {
+                    const fTime = formatAMPM(startTime);
+                    createdEventIds.push(response.body.id.toString());
+                    console.log(`🚀 تم الرفع: ${title} | الوقت: ${fTime} | ID: ${response.body.id}`);
+                }
+            }
             startTime = new Date(endTime.getTime());
         }
 
@@ -72,24 +70,26 @@ service.on('ready', async () => {
         if (fs.existsSync(imagePath)) {
             const thumbnailBuffer = await sharp(imagePath).jpeg({ quality: 90 }).toBuffer();
 
-            for (const record of surveyRecords) {
+            for (const id of createdEventIds) {
                 try {
                     const imageResponse = await service.event.group.updateThumbnail(
-                        parseInt(record.id),
+                        parseInt(id),
                         thumbnailBuffer
                     );
                     console.log(imageResponse.success
-                        ? `🖼️ تم رفع صورة: ID ${record.id}`
-                        : `⚠️ فشلت صورة ID ${record.id}: ${JSON.stringify(imageResponse)}`
+                        ? `🖼️ تم رفع صورة: ID ${id}`
+                        : `⚠️ فشلت صورة ID ${id}: ${JSON.stringify(imageResponse)}`
                     );
                 } catch (err) {
-                    console.error(`❌ خطأ برفع صورة ID ${record.id}:`, err.message);
+                    console.error(`❌ خطأ برفع صورة ID ${id}:`, err.message);
                 }
                 await new Promise(resolve => setTimeout(resolve, 800));
             }
         } else {
             console.error(`❌ الصورة غير موجودة بالمسار: ${imagePath}`);
         }
+
+        console.log("🏁 انتهى الرفع.");
 
     } catch (err) {
         console.error("❌ خطأ:", err.message);
