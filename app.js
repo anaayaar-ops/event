@@ -23,7 +23,7 @@ service.on('ready', async () => {
     
     const targetGroup = 18432094;
     const totalEvents = 32;
-    let startTime = new Date(2026, 7, 27, 21, 0, 0); // تبدأ من الوقت المحدد
+    let startTime = new Date(2026, 7, 28, 21, 0, 0); // تبدأ من الوقت المحدد
     const createdEventIds = []; // فقط لتتبع الصور المرفوعة، بدون حفظ بيانات استبيان
 
     try {
